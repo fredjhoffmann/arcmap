@@ -1,0 +1,47 @@
+#working on some python code to try to pull information from an attribute table, run it through the arcmap's cost path 
+#tool to select only certain data, and arrange them in a new p
+#needs to be run through cost through cost distance first
+#synthax for cost distance tool: CostDistance (in_source_data, in_cost_raster, {maximum_distance}, {out_backlink_raster})
+#synthax for cost path tool: CostPath (in_destination_data, in_cost_distance_raster, in_cost_backlink_raster, {path_type}, {destination_field})
+
+
+#here's the general idea of what I want to do, although synthax is a work in progress
+
+
+import arcpy
+arcpy.env.workspace=r'C:\Users\xxxx'
+from arcpy.sa import *
+arcpy.ImporToolbox(Toolboxes\System Toolboxes\Spatial Analyst Tools.tbx\Distance\Cost Distance)
+arcpy.ImporToolbox(Toolboxes\System Toolboxes\Spatial Analyst Tools.tbx\Distance\Cost Path)
+
+x = 5 #threshold cost
+n = OBJECT ID of shapefile attribute table (so the identifier of each polygon)
+m = r'C:\Users\xxxx'the whole shapefile (with information for each polygon)
+cost = r'C:\Users\xxxx' cost raster created formerly
+output = table #table with two columns: one of n and one of m, destination for data that meets criteria
+distance = distance[] #list of cost distance values
+backlink = backlink[] #list of cost backlink values for every time it w
+
+n=1
+while (n=<m):
+if CostDistance (n, cost, x) from n to m =<x:
+    add to output
+elif n=m:
+    skip
+else:
+    skip
+
+#or is the whole cost backling and cost path tool necessary??
+
+n=1
+while (n=<m):
+if CostDistance (n, cost, x, "backlink") from n to m =<x: #find a way to add "backlink" result to the backlink[]
+    add to distance[]
+elif n=m:
+    skip
+else:
+    skip
+
+if CostPath(m, 
+
+n=n+
