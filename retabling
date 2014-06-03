@@ -1,11 +1,9 @@
 #working on some python code to try to pull information from an attribute table, run it through the arcmap's cost path 
 #tool to select only certain data
-#needs to be run through cost through cost distance first
+#needs to be run through cost distance first
 #synthax for cost distance tool: CostDistance (in_source_data, in_cost_raster, {maximum_distance}, {out_backlink_raster})
 #synthax for cost path tool: CostPath (in_destination_data, in_cost_distance_raster, in_cost_backlink_raster, {path_type}, {destination_field})
 
-
-#here's the general idea of what I want to do, although synthax is a work in progress
 arcpy.ImportToolbox("Toolboxes\System Toolboxes\Spatial Analyst Tools.tbx\Distance\Cost Distance")
 arcpy.ImportToolbox("Toolboxes\System Toolboxes\Spatial Analyst Tools.tbx\Distance\Cost Path")
 
