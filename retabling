@@ -6,27 +6,25 @@
 
 
 #here's the general idea of what I want to do, although synthax is a work in progress
-
+arcpy.ImportToolbox("Toolboxes\System Toolboxes\Spatial Analyst Tools.tbx\Distance\Cost Distance")
+arcpy.ImportToolbox("Toolboxes\System Toolboxes\Spatial Analyst Tools.tbx\Distance\Cost Path")
 
 import arcpy
 arcpy.env.workspace=r'C:\Users\frederichoffmann\Desktop\ESRI_summer2014\settlements_draft.gdb'
 from arcpy.sa import *
+
 import arcpy.da
-
-
-cursor=arcpy.da.InsertCursor(output,n,m)
-arcpy.ImporToolbox("Toolboxes\System Toolboxes\Spatial Analyst Tools.tbx\Distance\Cost Distance")
-arcpy.ImporToolbox("Toolboxes\System Toolboxes\Spatial Analyst Tools.tbx\Distance\Cost Path")
-cost=r'C:\Users\frederichoffmann\Desktop\ESRI_summer2014\settlements_draft.gdb\costlayer' #cost raster created formerly 
-output=r'C:\Users\frederichoffmann\Desktop\ESRI_summer2014\settlements_draft.gdb\joinabletowns' #table with two columns: one of n and one of m, destination for data that meets criteria
-costD=r'C:\Users\frederichoffmann\Desktop\ESRI_summer2014\settlements_draft.gdb\cost_dist' # costdistance raster 
-costB=r'C:\Users\frederichoffmann\Desktop\ESRI_summer2014\settlements_draft.gdb\cost_backlink' #costbacklink raster 
+cost='C:\Users\frederichoffmann\Desktop\ESRI_summer2014\settlements_draft.gdb\costlayer' #cost raster created formerly 
+output='C:\Users\frederichoffmann\Desktop\ESRI_summer2014\settlements_draft.gdb\joinabletowns' #table with two columns: one of n and one of m, destination for data that meets criteria
+costD='C:\Users\frederichoffmann\Desktop\ESRI_summer2014\settlements_draft.gdb\cost_dist' # costdistance raster 
+costB='C:\Users\frederichoffmann\Desktop\ESRI_summer2014\settlements_draft.gdb\cost_backlink' #costbacklink raster 
 x=1000 #threshold cost 
-n=arcpy.da.SearchCursor(in_table, field_names) #of shapefile attribute table (so theidentifier of each polygon) a variable that will move a 
-m=((arcpy.da.SearchCursor(in_table, field_names))+1) #list of all values for n
+n ='arcpy.da.SearchCursor(in_table, field_names)' #of shapefile attribute table (so theidentifier of each polygon) a variable that will move a 
+m ='1+[arcpy.da.SearchCursor(in_table, field_names)]' #list of all values for n
 costpath=CostPath('n', 'costD', 'costB','EACH_ZONE','m')
+cursor=arcpy.da.InsertCursor(output,n,m)
 
-while (n=<m):
+while (n<=m):
 	if 'costpath'<='x':
 		cursor.insertRow([n,m])
 	else:
