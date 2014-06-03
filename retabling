@@ -1,14 +1,4 @@
 #working on some python code to try to pull information from an attribute table, run it through the arcmap's cost path 
-#tool to select only certain data, and arrange them in a new p
-#needs to be run through cost through cost distance first
-#synthax for cost distance tool: CostDistance (in_source_data, in_cost_raster, {maximum_distance}, {out_backlink_raster})
-#synthax for cost path tool: CostPath (in_destination_data, in_cost_distance_raster, in_cost_backlink_raster, {path_type}, {destination_field})
-
-
-#here's the general idea of what I want to do, although synthax is a work in progress
-
-
-#working on some python code to try to pull information from an attribute table, run it through the arcmap's cost path 
 #tool to select only certain data
 #needs to be run through cost through cost distance first
 #synthax for cost distance tool: CostDistance (in_source_data, in_cost_raster, {maximum_distance}, {out_backlink_raster})
@@ -19,37 +9,26 @@
 
 
 import arcpy
-arcpy.env.workspace=r'C:\Users\xxxx'
+arcpy.env.workspace=r'C:\Users\frederichoffmann\Desktop\ESRI_summer2014\settlements_draft.gdb'
 from arcpy.sa import *
-arcpy.ImporToolbox(Toolboxes\System Toolboxes\Spatial Analyst Tools.tbx\Distance\Cost Distance)
-arcpy.ImporToolbox(Toolboxes\System Toolboxes\Spatial Analyst Tools.tbx\Distance\Cost Path)
+import arcpy.da
 
-x = 5 #threshold cost n = OBJECTID #of shapefile attribute table (so the
-identifier of each polygon) a variable that will move a m =
-r'C:\Users\xxxx'the whole shapefile (with information for each polygon) cost =
-r'C:\Users\xxxx' cost raster created formerly output = table #table with two
-columns: one of n and one of m, destination for data that meets criteria
-distance = distance[] #list of cost distance values backlink = backlink[]
-#list of cost backlink values
 
-n=1
+cursor=arcpy.da.InsertCursor(output,n,m)
+arcpy.ImporToolbox("Toolboxes\System Toolboxes\Spatial Analyst Tools.tbx\Distance\Cost Distance")
+arcpy.ImporToolbox("Toolboxes\System Toolboxes\Spatial Analyst Tools.tbx\Distance\Cost Path")
+cost=r'C:\Users\frederichoffmann\Desktop\ESRI_summer2014\settlements_draft.gdb\costlayer' #cost raster created formerly 
+output=r'C:\Users\frederichoffmann\Desktop\ESRI_summer2014\settlements_draft.gdb\joinabletowns' #table with two columns: one of n and one of m, destination for data that meets criteria
+costD=r'C:\Users\frederichoffmann\Desktop\ESRI_summer2014\settlements_draft.gdb\cost_dist' # costdistance raster 
+costB=r'C:\Users\frederichoffmann\Desktop\ESRI_summer2014\settlements_draft.gdb\cost_backlink' #costbacklink raster 
+x=1000 #threshold cost 
+n=arcpy.da.SearchCursor(in_table, field_names) #of shapefile attribute table (so theidentifier of each polygon) a variable that will move a 
+m=((arcpy.da.SearchCursor(in_table, field_names))+1) #list of all values for n
+costpath=CostPath('n', 'costD', 'costB','EACH_ZONE','m')
+
 while (n=<m):
-if [CostDistance ('n', 'cost', 'x') from n to m] =<'x':
-	output.append(n, m)
-elif n=m:
- 	pass
-else:
- 	pass
-
-#is the whole cost backlink and cost path tool necessary??
-
-n=1
-while (n=<m):
-if CostPath (n, cost, x, "backlink") from n to m =<x: #find a way to add "backlink" result to the backlink[]
- 	distance.append(n,m)
-elif n=m:
-	pass
-else:
-	pass
-
-#anyone know if this adds to the findings?
+	if 'costpath'<='x':
+		cursor.insertRow([n,m])
+	else:
+ 		print "done"
+ 		n+=1
