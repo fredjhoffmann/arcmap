@@ -1,0 +1,15 @@
+## this part is to check each cost path (between a settlement (miyun villages row) and the next) with relation to threshold
+
+threshhold_cost=1000
+for FID in 'miyun_villages_poly':
+	if arcpy.sa.CostPath('miyun_villages_poly'[0][0], 'C:\\Users\\frederichoffmann\\Desktop\\ESRI_summer2014\\settlements_draft.gdb\\cost_dist', 'C:\\Users\\frederichoffmann\\Desktop\\ESRI_summer2014\\settlements_draft.gdb\\cost_backlink','EACH_ZONE') <=threshhold_cost:
+		output.append('miyun_villages_poly'[0][0])
+		del cursor
+	if arcpy.sa.CostPath('miyun_villages_poly'[0][0], 'C:\\Users\\frederichoffmann\\Desktop\\ESRI_summer2014\\settlements_draft.gdb\\cost_dist', 'C:\\Users\\frederichoffmann\\Desktop\\ESRI_summer2014\\settlements_draft.gdb\\cost_backlink','EACH_ZONE')>=threshhold_cost:
+		continue
+	else:
+		print "done"
+		'miyun_villages_poly'[0][0]+=1
+		
+#the 'shapefile'[0][0] format is to define the line from which the data must be taken
+#should append value of FID into joinabletables
