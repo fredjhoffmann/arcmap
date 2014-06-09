@@ -1,0 +1,101 @@
+#just a copy/paste of the master doc i am working on. each other in arcmap/ should fit into this somehow
+
+#working on some python code to try to pull information from an attribute table, run it through the arcmap's cost path 
+#tool to select only certain data
+#needs to be run through cost through cost distance first
+#synthax for cost distance tool: CostDistance (in_source_data, in_cost_raster, {maximum_distance}, {out_backlink_raster})
+#synthax for cost path tool: CostPath (in_destination_data, in_cost_distance_raster, in_cost_backlink_raster, {path_type}, {destination_field})
+
+
+#here's the general idea of what I want to do, although synthax is a work in progress
+import arcpy
+arcpy.env.workspace='C:\\Users\\frederichoffmann\\Desktop\\ESRI_summer2014\\settlements_draft.gdb'
+import arcpy.sa
+from arcpy.sa import CostPath
+from arcpy.sa import CostDistance
+import arcpy.da
+
+#cost raster created formerly 
+cost='C:\\Users\\frederichoffmann\\Desktop\\ESRI_summer2014\\settlements_draft.gdb\\costlayer'
+#table with two columns: one of n and one of m, destination for data that meets criteria
+output='C:\\Users\\frederichoffmann\\Desktop\\ESRI_summer2014\\settlements_draft.gdb\\joinabletowns'
+# costdistance raster 
+costD='C:\\Users\\frederichoffmann\\Desktop\\ESRI_summer2014\\settlements_draft.gdb\\cost_dist' 
+#costbacklink raster
+costB='C:\\Users\\frederichoffmann\\Desktop\\ESRI_summer2014\\settlements_draft.gdb\\cost_backlink'
+miyun_pol_ex='C:\\Users\\frederichoffmann\\Desktop\\ESRI_summer2014\\settlements_draft.gdb\\miyun_v_pol_ex'
+miyun_villages_poly='C:\\Users\\frederichoffmann\\Desktop\\ESRI_summer2014\\Miyun_everything_raw\\popcenters\\miyun_villages_poly.shp'
+villagesnear = 'C:\\Users\\frederichoffmann\\Desktop\\ESRI_summer2014\\settlements_draft.gdb\\villagesnear'
+
+#gets the in_fid and near_fid from the villagesnear table
+villages = []
+for row in arcpy.da.SearchCursor(villagesnear,['IN_FID','NEAR_FID']):
+	villages.append(row)
+	#villages represents a table with the ID of every village within 500m of another village
+
+#gets all the information in miyun_vilalges_poly
+miyun_villages_poly_set = []
+for row in arcpy.da.SearchCursor(miyun_villages_poly,'*'):
+	miyun_villages_poly_set.append(row)
+#so links the village IDs to poligon information
+
+#sort set by fid
+miyun_villages_poly_set.sort()
+
+
+
+##   costpath=arcpy.sa.CostPath(n, 'costD', 'costB','EACH_ZONE', miyun_villages_poly.m)
+##find proper synthax for n to make sure it keeps the spatial data related to it in miyun villages poly. 
+##the loop needs to be here, not in the cost.
+##   cursor=arcpy.da.InsertCursor('output','n','m')
+
+#how about having a loop to find all cost paths, then one to find if its higher or lower than threshhold cost.
+for FID in miyun_villages_poly:
+	if arcpy.SearchCursor(miyun_villages_poly, 'FID')<=4909
+		arcpy.CostPath(FID[0],costD, costB,'EACH_ZONE')
+		FID[0+=1]
+
+>>> arcpy.sa.CostDistance(arcpy.da.SearchCursor(miyun_villages_poly, 'FID'), "costlayer")
+
+
+
+outfile.close()
+
+threshhold_cost=1000
+for FID in 'miyun_villages_poly':
+	if arcpy.sa.CostPath('miyun_villages_poly'[0][0], 'C:\\Users\\frederichoffmann\\Desktop\\ESRI_summer2014\\settlements_draft.gdb\\cost_dist', 'C:\\Users\\frederichoffmann\\Desktop\\ESRI_summer2014\\settlements_draft.gdb\\cost_backlink','EACH_ZONE') <=threshhold_cost:
+		output.append('miyun_villages_poly'[0][0])
+		del cursor
+	if arcpy.sa.CostPath('miyun_villages_poly'[0][0], 'C:\\Users\\frederichoffmann\\Desktop\\ESRI_summer2014\\settlements_draft.gdb\\cost_dist', 'C:\\Users\\frederichoffmann\\Desktop\\ESRI_summer2014\\settlements_draft.gdb\\cost_backlink','EACH_ZONE')>=threshhold_cost:
+		continue
+	else:
+		print "done"
+		'miyun_villages_poly'[0][0]+=1
+
+
+# #if the loop exists in the calculating of the costpath, it does not need to be made here, so the below code should work. 
+# while costpath<=threshhold_cost:
+# 	cursor.insertRow([n],[m])
+# 	del cursor
+# 	costpath+=1
+
+
+# #to join the polygons into one:
+# #either merge
+# arcpy.Merge_management(["shapes represented by m", "shapes represented by n"], "C:/output/Output.gdb/")
+# #source http://resources.arcgis.com/en/help/main/10.2/index.html#/Merge/001700000055000000/
+# #or, but less sure about:
+# import arcmap
+# target_features =c:/Users... #the values for n 
+# join_features = c:/sers... #the values for m
+# out_feature_class = c:/users... #joined polygons -> the settlements which will now be considered as one in_source_data
+
+# arcpy.SpatialJoin_analysis(target_features, join_features, out_feature_class)
+# #source http://resources.arcgis.com/en/help/main/10.1/index.html#//00080000000q000000
+
+# #joined polygons then need to be added to miyun_villages_poly to get a poligon set of all settlements in miyun.
+# #use append tool http://resources.arcgis.com/en/help/main/10.2/index.html#//001700000050000000
+# #synthax: import arcpy
+# #arcpy.env.workspace = "C:/data/"
+# #arcpy.Append_management(["north.shp", "south.shp", "east.shp", "west.shp"], "wholecity.shp", "TEST","","")
+# #then snap centroids to rivers / calculate service sheds
