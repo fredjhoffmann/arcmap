@@ -13,3 +13,4 @@ for row in cursor:
 	
 #the result (processing at the time of writing) will be a database (miyun_allvillages.gdb) containing one shapefile
 #for each polygon
+	#got help from http://gis.stackexchange.com/questions/101508/creating-many-shapefiles-from-one-multi-polygonal-shapefile 
