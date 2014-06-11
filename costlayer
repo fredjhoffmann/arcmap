@@ -1,0 +1,15 @@
+the cost layer is made of:
+- distance between villages (buffer)
+- topography (ridges and slope)
+- rivers
+\\\possibly extend to land use
+more information in doc steps_settlements.docx
+
+cost=costlayer="E_ridgecost1"+'stream_cost3'+'Reclass_slop2'+'Reclass_dist4' 
+
+E_ridgecost1 made with inversed DEM and stream network (more details here http://support.esri.com/en/knowledgebase/techarticles/detail/39093)
+ridges given cost 100, rest set to 0.001 (0) -> based on stream orders of inversed streams
+stream_cost3 was made with flowdir, flow acc, and stream orders (straehler)
+different cost given to different order
+Reclass_slop2 is a reclassed normalised slope to give it values 1-9 rather than 0-1
+reclass_dist4 is a reclassification of a 500m buffer around village poligons. 100 is out of buffer, 1cost is within
