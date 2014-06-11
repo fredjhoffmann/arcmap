@@ -19,6 +19,6 @@ dataextraction.py and costpath.py will be of use in future steps
 
 master is the central file which will be updated to reflect the whole process once it is time 
 
-costlayer.py defines how the cost layer was created
+costlayer defines how the cost layer was created
 
 extractandcostdist.py is the first steps, until cost distance for each village has been decided
