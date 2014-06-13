@@ -8,7 +8,7 @@ import time
 cost='C:\\Users\\frederichoffmann\\Desktop\\ESRI_summer2014\\settlements_draft.gdb\\costlayer'
 arcpy.CheckOutExtension("Spatial")
 arcpy.env.overwriteOutput = True
-def myfun(row, start, end):
+def extractcostfun(row, start, end):
 	t1 = time.time()
 	FID = str(row.getValue("FID"))
 	where = '"FID" =' + FID
@@ -23,4 +23,4 @@ def myfun(row, start, end):
 fc='C:\\Users\\frederichoffmann\\Desktop\\ESRI_summer2014\\Miyun_everything_raw\\popcenters\\miyun_villages_poly.shp'
 cursor=arcpy.SearchCursor(fc)
 for row in cursor:
-	myfun(row, 600, 602)
+	extractcostfun(row, 1500, 1800)
