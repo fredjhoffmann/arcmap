@@ -1,28 +1,36 @@
 import arcpy
 arcpy.env.workspace='C:\\Users\\frederichoffmann\\Desktop\\ESRI_summer2014\\miyun_allvillages.gdb'
 import arcpy.sa
-from arcpy.sa import CostPath
-from arcpy.sa import CostDistance
 import arcpy.da
 cost='C:\\Users\\frederichoffmann\\Desktop\\ESRI_summer2014\\settlements_draft.gdb\\costlayer'
 def mergefun(row, start, end):
 	FIDa=str(row.getValue("FID")) in range (start,end)
 	FIDb=str(row.getValue("FID")) in range (start,end)
-	wherea ='"FID" =' + FIDa
-	whereb ='"FID" =' + FIDb
+	#wherea ='"FID" =%s'%FIDa
+	#whereb ='"FID" =%s'%FIDb
 	out_fla='out_fl%i'%FIDa
 	out_flab='out_fl%i'%FIDb
+	overlap='overlapfile'
+	extract='extractfile'
+	minimum='minimumfile'
 	threshold=50000
-	arcpy.SelectFeatureLayerByLocation_manager('codist_{0}'.format(FIDa), INTERSECT, out_flab).save(overlap)
-	if arcpy.Exists(overlap) is True:
-		arcpy.sa.ExtractByMask('codist_{0}'.format(FIDa), out_flab).save(extract)
-		print 'extract done {0} from {1}'.format(int(FIDa),int(FIDb))
-		arcpy.GetRasterProperties_management("extract","MINIMUM").save('minimum')
-		if int(getValue(minimum)) <= int(threshold):
-			arcpy.Merge_management(out_fla,out_flab,'C:\\Users\\frederichoffmann\\Desktop\\ESRI_summer2014\\joinedtowns.gdb\\"merged_towns')
-			t2=time.asctime()
-			arcpy.Delete_management(minimum)
-			print 'merge done at {0}'.format((t2))
+	#make the feature layers
+	if int(FIDa)>=start and int(FIDa)<end: 
+		arcpy.MakeFeatureLayer_management(fc,out_fla)#,wherea
+	if int(FIDb)>=start and int(FIDb)<end: 
+		arcpy.MakeFeatureLayer_management(fc,out_flab)#,whereb
+	arcpy.sa.ZonalStatistics(out_flab, 'FID', 'C:\\Users\\frederichoffmann\\Desktop\\ESRI_summer2014\\miyun_allvillages.gdb\\codist_%i'%FIDa,"MINIMUM").save(minimum) #find out if villages overlap with cost layers
+	#if arcpy.Exists(overlap) is True: #select only thos which do overlap
+	#	arcpy.sa.ExtractByMask('codist_{0}'.format(FIDa), out_flab).save(extract) #extract cost information for overlap
+	#	print 'extract done {0} from {1}'.format(int(FIDa),int(FIDb)) 
+	#	arcpy.GetRasterProperties_management("extract","MINIMUM").save(minimum) #get minimum values of costs
+	if minimum <= threshold: #find out if distance fits within travel threshold
+		arcpy.Merge_management(out_fla,out_flab,'C:\\Users\\frederichoffmann\\Desktop\\ESRI_summer2014\\mergedvillages.gdb\\mergedvillages') #merge villages
+		t2=time.asctime()
+		arcpy.Delete_management(minimum)
+		print 'merge done at {0}'.format((t2))
+	else:
+		print 'minimum !< threshold'
 	arcpy.Delete_management(FIDa)
 	arcpy.Delete_management(FIDb)
 	arcpy.Delete_management(out_fla)
