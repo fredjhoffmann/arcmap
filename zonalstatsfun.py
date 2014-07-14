@@ -21,3 +21,51 @@ fc='C:\\Users\\frederichoffmann\\Desktop\\ESRI_summer2014\\servicesheds_2014-06-
 cursor=arcpy.da.SearchCursor(fc, "FID")
 for FID in cursor:
 	zonalstatsfun(FID,0,0) #til total 2896
+
+
+##### DOING THIS WITHOUT DEFINING A FUNCTION
+### idea curtesy of @nonpenso from GIS SE. code updated/altered by fredjhoffmann
+ ##source : http://gis.stackexchange.com/questions/106839/calculating-zonal-statistics-of-raster-data-in-multiple-overlapping-zones-and-co/107076#107076 link
+
+import arcpy
+arcpy.CheckOutExtension("spatial")
+arcpy.env.overwriteOutput = True
+
+workdir = r'C:\Users\frederichoffmann\Desktop\ESRI_summer2014'
+inraster = workdir + r'\invest_workspace\sedimentretention1990\output\rkls_1990.tif'
+zonal_shp = workdir + r'\servicesheds_2014-06-24\servicesheds_v0.shp'
+tab_template = workdir + r'\zonaldata.gdb\template_fidsum'
+
+stat_table = workdir + r'\zonaldata.gdb\statable'
+arcpy.CreateTable_management(workdir + r'\zonaldata.gdb','statable', tab_template)
+
+with arcpy.da.SearchCursor(zonal_shp, ['FID']) as rows:
+    for row in rows:
+
+        fid = row[0]
+
+        expression = '"FID" = ' + str(fid)
+        temp_shp = workdir + r'\tempshp.shp'
+        arcpy.Select_analysis(zonal_shp, temp_shp, expression)
+
+        temp_tab =  workdir + r'\temptab.dbf'
+        arcpy.sa.ZonalStatisticsAsTable(temp_shp, 'FID', inraster, temp_tab, "DATA", "SUM")
+
+        with arcpy.da.UpdateCursor(temp_tab, ['FID_']) as recs:
+            for rec in recs:
+                rec[0] = fid
+                recs.updateRow(rec)
+                print 'row updated{0}'.format(fid)
+        with arcpy.da.UpdateCursor(temp_shp, 'Name') as FIDs:
+            for FID in FIDs:
+            	FID[0] = fid
+                FIDs.updateRow(FID)
+                print 'FID updated{0}'.format(fid)
+        del rec, recs, FID, FIDs
+
+        arcpy.Append_management(temp_tab, stat_table, 'NO_TEST')
+
+        arcpy.Delete_management(temp_tab)
+        arcpy.Delete_management(temp_shp)
+
+del row, rows
