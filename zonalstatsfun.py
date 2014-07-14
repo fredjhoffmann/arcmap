@@ -1,6 +1,6 @@
 #the aim of this code is to extract data from a raster for each polygon in a feature class where polygons overlap
 #this will permit the user to aggregate raster data to overlapping subwatershed or serviceshed level
-
+### SEE BELOW FOR MORE RECENT CODE
 import arcpy
 arcpy.env.workspace='C:\\Users\\frederichoffmann\\Desktop\\ESRI_summer2014'
 import arcpy.sa
