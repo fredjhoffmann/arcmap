@@ -36,7 +36,7 @@ inraster = workdir + r'\invest_workspace\sedimentretention1990\output\rkls_1990.
 zonal_shp = workdir + r'\servicesheds_2014-06-24\servicesheds_v0.shp'
 tab_template = workdir + r'\zonaldata.gdb\template_fidsum'
 
-stat_table = workdir + r'\zonaldata.gdb\statable'
+stat_table = workdir + r'\zonaldata.gdb\statable1'
 arcpy.CreateTable_management(workdir + r'\zonaldata.gdb','statable', tab_template)
 
 with arcpy.da.SearchCursor(zonal_shp, ['FID']) as rows:
@@ -55,8 +55,8 @@ with arcpy.da.SearchCursor(zonal_shp, ['FID']) as rows:
             for rec in recs:
                 rec[0] = fid
                 recs.updateRow(rec)
-                print 'row updated{0}'.format(fid)
-        with arcpy.da.UpdateCursor(temp_shp, 'Name') as FIDs:
+                print 'sum updated{0}'.format(fid)
+        with arcpy.da.UpdateCursor(temp_tab, 'Name') as FIDs:
             for FID in FIDs:
             	FID[0] = fid
                 FIDs.updateRow(FID)
