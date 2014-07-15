@@ -34,7 +34,7 @@ arcpy.env.overwriteOutput = True
 workdir = r'C:\Users\frederichoffmann\Desktop\ESRI_summer2014'
 inraster = workdir + r'\invest_workspace\sedimentretention1990\output\rkls_1990.tif'
 zonal_shp = workdir + r'\servicesheds_2014-06-24\servicesheds_v0.shp'
-tab_template = workdir + r'\socioecon_settlements.gdb\USLE_sshed90'
+tab_template = workdir + r'\zonaldata.gdb\template_fidsum'
 
 stat_table = workdir + r'\zonaldata.gdb\statable1'
 arcpy.CreateTable_management(workdir + r'\zonaldata.gdb','statable1', tab_template)
@@ -57,7 +57,7 @@ with arcpy.da.SearchCursor(zonal_shp, ['FID']) as rows:
                     rec[0] = fid
                     recs.updateRow(rec)
                     print 'updated rec{0}'.format(fid)
-            except NameError:
+            except NameError, RuntimeError:
                 print 'skipped for nameerror'
                 pass
         del rec, recs
@@ -68,7 +68,6 @@ with arcpy.da.SearchCursor(zonal_shp, ['FID']) as rows:
         arcpy.Delete_management(temp_shp)
 
 del row, rows
-
 ##what i'd like to make work
 ## much of what is hashed out does not function.
 import arcpy
