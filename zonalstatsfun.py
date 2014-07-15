@@ -34,10 +34,10 @@ arcpy.env.overwriteOutput = True
 workdir = r'C:\Users\frederichoffmann\Desktop\ESRI_summer2014'
 inraster = workdir + r'\invest_workspace\sedimentretention1990\output\rkls_1990.tif'
 zonal_shp = workdir + r'\servicesheds_2014-06-24\servicesheds_v0.shp'
-tab_template = workdir + r'\zonaldata.gdb\template_fidsum'
+tab_template = workdir + r'\socioecon_settlements.gdb\USLE_sshed90'
 
 stat_table = workdir + r'\zonaldata.gdb\statable1'
-arcpy.CreateTable_management(workdir + r'\zonaldata.gdb','statable', tab_template)
+arcpy.CreateTable_management(workdir + r'\zonaldata.gdb','statable1', tab_template)
 
 with arcpy.da.SearchCursor(zonal_shp, ['FID']) as rows:
     for row in rows:
@@ -52,20 +52,79 @@ with arcpy.da.SearchCursor(zonal_shp, ['FID']) as rows:
         arcpy.sa.ZonalStatisticsAsTable(temp_shp, 'FID', inraster, temp_tab, "DATA", "SUM")
 
         with arcpy.da.UpdateCursor(temp_tab, ['FID_']) as recs:
-            for rec in recs:
-                rec[0] = fid
-                recs.updateRow(rec)
-                print 'sum updated{0}'.format(fid)
-        with arcpy.da.UpdateCursor(temp_tab, 'Name') as FIDs:
-            for FID in FIDs:
-            	FID[0] = fid
-                FIDs.updateRow(FID)
-                print 'FID updated{0}'.format(fid)
-        del rec, recs, FID, FIDs
+            try:
+                for rec in recs:
+                    rec[0] = fid
+                    recs.updateRow(rec)
+                    print 'updated rec{0}'.format(fid)
+            except NameError:
+                print 'skipped for nameerror'
+                pass
+        del rec, recs
 
         arcpy.Append_management(temp_tab, stat_table, 'NO_TEST')
 
         arcpy.Delete_management(temp_tab)
         arcpy.Delete_management(temp_shp)
+
+del row, rows
+
+##what i'd like to make work
+## much of what is hashed out does not function.
+import arcpy
+import arcpy.da
+import arcpy.sa
+arcpy.CheckOutExtension("spatial")
+arcpy.env.overwriteOutput = True
+
+workdir = r'C:\Users\frederichoffmann\Desktop\ESRI_summer2014'
+inraster = workdir + r'\invest_workspace\sedimentretention1990\output\rkls_1990.tif'
+zonal_shp = workdir + r'\servicesheds_2014-06-24\servicesheds_v0.shp'
+tab_template = workdir + r'\zonaldata.gdb\template_namesum'
+# outside_extent = workdir + r'\zonaldata.gdb\outex_tab'
+
+stat_table = workdir + r'\zonaldata.gdb\statable1'
+arcpy.CreateTable_management(workdir + r'\zonaldata.gdb','statable1', tab_template)
+# arcpy.CreateTable_management(workdir + r'\zonaldata.gdb','outex_tab', tab_template)
+
+with arcpy.da.SearchCursor(zonal_shp, ['Name']) as rows:
+    for row in rows:
+
+        Name = row[0]
+
+        expression = '"Name" = ' + str(Name)
+        temp_shp = workdir + r'\tempshp.shp'
+        arcpy.Select_analysis(zonal_shp, temp_shp, expression) #change "NAME" back to expression if doesnt work
+
+        temp_tab =  workdir + r'\temptab.dbf'
+        arcpy.sa.ZonalStatisticsAsTable(temp_shp, 'Name', inraster, temp_tab, "DATA")#, "SUM")
+        # arcpy.CreateTable_management(workdir, 'tempout.dbf', temp_tab)
+        with arcpy.da.UpdateCursor(temp_tab, ['Name']) as recs:
+            for rec in recs:
+                rec[0] = Name
+                try:
+                    recs.updateRow(rec)
+                    print 'sum updated{0}'.format(rec[0])
+                except NameError:
+                    print 'out of extent'
+                    pass
+                    # with arcpy.da.UpdateCursor(temp_out) as outrows:
+                    #     for outrow in outrows:
+                    #     	outrow[0] = fid w
+                    #     	outrows.updateRow(outrow)
+                    #     	print 'out of extent'
+        # with arcpy.da.UpdateCursor(temp_tab, 'OID') as names: ##change OID if names do not come up as different SSHED names
+        #     for name in names:
+        #         name[0] = fid
+        #         names.updateRow(name)
+        #         print 'FID updated{0}'.format(fid)
+        del rec, recs#, outrow, outrows #name, names
+
+        arcpy.Append_management(temp_tab, stat_table, 'NO_TEST')
+        # arcpy.Append_management(temp_out, outside_extent, 'NO_TEST')
+
+        arcpy.Delete_management(temp_tab)
+        arcpy.Delete_management(temp_shp)
+        # arcpy.Delete_management(temp_out)
 
 del row, rows
