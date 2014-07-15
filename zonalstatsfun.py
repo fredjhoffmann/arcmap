@@ -127,3 +127,35 @@ with arcpy.da.SearchCursor(zonal_shp, ['Name']) as rows:
         # arcpy.Delete_management(temp_out)
 
 del row, rows
+
+
+##### simplest, most effective version below. most similar to orginal approach too. much faster than other approaches
+## only issue is that I cannot get it to only run for a certain amount of rows (it repeats to infinity)
+#output is good: a table with FID and SUM of all values within zone. would be nice to have a column called Name with the 
+#sshed name, but not a problem because FID can be a proxy for that.
+
+
+import arcpy
+from arcpy import da, sa, os
+arcpy.CheckOutExtension("spatial")
+arcpy.env.overwriteOutput = True
+
+workdir = r'C:\Users\frederichoffmann\Desktop\ESRI_summer2014'
+zonaldb = workdir + r'\zonaldata.gdb'
+tab_template = workdir + r'\zonaldata.gdb\template_sum'
+
+statable=arcpy.CreateTable_management(zonaldb,'statable', tab_template)
+values=arcpy.CreateTable_management(zonaldb,'sshed_rkls90', statable)
+fc='C:\\Users\\frederichoffmann\\Desktop\\ESRI_summer2014\\servicesheds_2014-06-24\\servicesheds_v0.shp'
+cursor=arcpy.da.SearchCursor(fc, "FID")
+# start = 0
+# end = 15
+
+for FID in cursor:
+    0<=FID<=5 #this is useless!
+    value=workdir + r'\invest_workspace\sedimentretention1990\output\rkls_1990.tif' #XXXX = raster dataset holding values to be extracted
+    table= zonaldb + r'\sshed_rkls90'
+    FID="FID"
+    arcpy.sa.ZonalStatisticsAsTable(fc, FID, value, statable,"DATA","SUM")
+    arcpy.Append_management(statable,table,'NO_TEST')
+    print 'appended'
